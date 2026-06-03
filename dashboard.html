@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            /* Corporate Color Palette - Matched with index.html */
+            --primary: #0f172a;        /* Slate 900 */
+            --primary-light: #1e293b;  /* Slate 800 */
+            --primary-mid: #334155;    /* Slate 700 */
+            --accent: #c9963f;         /* Gold/Bronze */
+            --accent-hover: #b58532;   /* Darker Gold */
+            --accent-glow: rgba(201, 150, 63, 0.15);
+            --success: #059669;        /* Emerald 600 */
+            --danger: #dc2626;         /* Red 600 */
+            --warning: #d97706;        /* Amber 600 */
+            --info: #0284c7;           /* Light Blue 600 */
+            --text-main: #1e293b;      /* Slate 800 */
+            --text-muted: #475569;     /* Slate 600 */
+            --text-light: #94a3b8;     /* Slate 400 */
+            --bg-body: #f8fafc;        /* Slate 50 */
+            --bg-card: #ffffff;
+            --border: #e2e8f0;         /* Slate 200 */
+            --sidebar-w: 260px;
+            
+            /* Professional Borders (Sharper) */
+            --radius: 8px;
+            --radius-sm: 6px;
+            
+            /* Subtle, clean shadows */
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --transition: 0.2s ease-in-out;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .material-symbols-outlined {
+            vertical-align: middle;
+            font-size: 20px;
+        }
+
+        /* ── SIDEBAR ─────────────────────────────── */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--primary);
+            position: fixed;
+            left: 0; top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            z-index: 200;
+            transition: transform var(--transition);
+            overflow: hidden;
+            border-right: 1px solid var(--primary-light);
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .sidebar-brand-icon {
+            width: 36px; height: 36px;
+            background: var(--accent);
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+        .sidebar-brand-text .title { font-size: 15px; font-weight: 600; color: white; letter-spacing: 0.3px; }
+        .sidebar-brand-text .sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+        .btn-close-sidebar {
+            display: none;
+            margin-left: auto;
+            background: rgba(255,255,255,0.08);
+            border: none; color: rgba(255,255,255,0.6);
+            width: 32px; height: 32px;
+            border-radius: var(--radius-sm); 
+            cursor: pointer; align-items: center; justify-content: center;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 14px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-light) transparent;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 10px;
+            margin-bottom: 8px;
+            margin-top: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all var(--transition);
+            margin-bottom: 4px;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+        .nav-item .material-symbols-outlined { font-size: 18px; color: rgba(255,255,255,0.5); transition: color var(--transition); }
+        
+        .nav-item:hover {
+            color: white;
+            background: rgba(255,255,255,0.05);
+        }
+        .nav-item:hover .material-symbols-outlined { color: rgba(255,255,255,0.9); }
+        
+        .nav-item.active {
+            color: white;
+            background: var(--accent-glow);
+            border-color: rgba(201, 150, 63, 0.3);
+            font-weight: 500;
+        }
+        .nav-item.active .material-symbols-outlined {
+            color: var(--accent);
+        }
+        
+        .nav-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 16px 4px; }
+
+        .sidebar-user {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.1);
+        }
+        .sidebar-user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-avatar {
+            width: 36px; height: 36px;
+            border-radius: var(--radius-sm);
+            background: var(--primary-mid);
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+        .sidebar-user-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sidebar-user-tier {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+        .btn-logout-icon {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: color var(--transition);
+            display: flex;
+            align-items: center;
+        }
+        .btn-logout-icon:hover { color: var(--danger); }
+
+        /* ── MAIN CONTENT ─────────────────────────── */
+        .main-wrap {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .btn-hamburger {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            width: 36px; height: 36px;
+            color: var(--text-muted);
+            cursor: pointer;
+            align-items: center; justify-content: center;
+        }
+        .page-breadcrumb { font-size: 14px; color: var(--text-muted); }
+        .page-breadcrumb strong { color: var(--text-main); font-weight: 500; }
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+        
+        .topbar-pts {
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .topbar-pts .material-symbols-outlined { font-size: 16px; color: var(--accent); }
+        .topbar-pts .pts-num { color: var(--text-main); font-weight: 600; }
+
+        .main-page { padding: 32px; flex: 1; }
+
+        /* ── NOTIFICATION BANNER ─────────────────────────── */
+        .notification-banner {
+            background: linear-gradient(135deg, rgba(201,150,63,0.1), rgba(201,150,63,0.03));
+            border: 1px solid rgba(201,150,63,0.3);
+            border-radius: var(--radius);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #926b27;
+            font-size: 14px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.4s ease;
+        }
+        .notification-banner .material-symbols-outlined { font-size: 24px; color: var(--accent); }
+
+        /* ── HERO CARD ─────────────────────────── */
+        .hero-card {
+            background: var(--primary);
+            border-radius: var(--radius);
+            padding: 32px 36px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--primary-light);
+        }
+        .hero-card::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .hero-inner { position: relative; z-index: 1; width: 100%; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
+        .hero-left { display: flex; flex-direction: column; gap: 6px; }
+        .hero-greeting { font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; }
+        .hero-name { font-size: 24px; font-weight: 600; color: white; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        
+        .badge-tier { 
+            display: inline-flex; align-items: center; gap: 4px; 
+            background: var(--primary-mid); border: 1px solid rgba(255,255,255,0.1); 
+            color: white; padding: 4px 10px; border-radius: 4px; 
+            font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; 
+        }
+        .badge-admin { background: var(--danger); border-color: transparent; display: none; }
+        .hero-meta { font-size: 13px; color: rgba(255,255,255,0.6); }
+        
+        .hero-right { text-align: right; }
+        .pts-label { font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .pts-big { font-size: 36px; font-weight: 600; color: white; line-height: 1; }
+        .pts-unit { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.6); }
+
+        /* ── SECTIONS ─────────────────────────── */
+        .section-panel { display: none; animation: fadeIn 0.3s ease; }
+        .section-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .section-title { font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .section-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 300; }
+
+        /* ── TIER TABS ─────────────────────────── */
+        .tier-bar { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; border-bottom: 1px solid var(--border); }
+        .tier-bar::-webkit-scrollbar { display: none; }
+        .tier-tab {
+            padding: 8px 16px; 
+            border: none; border-bottom: 2px solid transparent; 
+            background: transparent; cursor: pointer; 
+            font-weight: 500; font-size: 13px; font-family: 'Prompt', sans-serif; 
+            color: var(--text-muted); transition: all 0.2s; white-space: nowrap;
+            margin-bottom: -1px;
+        }
+        .tier-tab:hover { color: var(--text-main); }
+        .tier-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        /* ── PRODUCT GRID ─────────────────────────── */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .product-card { background: var(--bg-card); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; border: 1px solid var(--border); transition: all var(--transition); }
+        .product-card:hover { border-color: #cbd5e1; box-shadow: var(--shadow); }
+        .product-img-wrap { width: 100%; aspect-ratio: 1; max-height: 160px; background: #f1f5f9; border-radius: var(--radius-sm); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e2e8f0; }
+        .product-img { max-width: 90%; max-height: 90%; object-fit: contain; mix-blend-mode: multiply; transition: transform 0.3s; }
+        .product-card:hover .product-img { transform: scale(1.03); }
+        .product-name { font-weight: 500; font-size: 14px; color: var(--text-main); margin-bottom: 8px; flex-grow: 1; line-height: 1.4; }
+        .product-cost { color: var(--text-main); font-weight: 600; font-size: 16px; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+        .product-cost .material-symbols-outlined { font-size: 16px; color: var(--accent); }
+        .product-stock { font-size: 12px; color: var(--text-light); margin-bottom: 16px; display: flex; align-items: center; gap: 4px;}
+        .product-stock .material-symbols-outlined { font-size: 14px; }
+        
+        .action-row { display: flex; gap: 8px; margin-top: auto; }
+        .qty-input { width: 60px; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); text-align: center; font-family: 'Prompt'; font-size: 13px; outline: none; }
+        .qty-input:focus { border-color: var(--accent); }
+        .btn-redeem { background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 500; font-size: 13px; font-family: 'Prompt', sans-serif; transition: all var(--transition); flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-redeem:hover:not(:disabled) { background: var(--primary-light); }
+        .btn-redeem:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+
+        /* ── HISTORY ── */
+        .history-list { display: flex; flex-direction: column; gap: 12px; }
+        .history-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; transition: border-color var(--transition); }
+        .history-item:hover { border-color: #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .history-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 220px; }
+        .history-thumb { width: 48px; height: 48px; border-radius: var(--radius-sm); background: #f1f5f9; border: 1px solid #e2e8f0; object-fit: contain; padding: 4px; flex-shrink: 0; }
+        .history-thumb-icon { width: 48px; height: 48px; border-radius: var(--radius-sm); background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); flex-shrink: 0; }
+        .history-name { font-weight: 500; font-size: 14px; color: var(--text-main); margin-bottom: 2px; }
+        .history-date { font-size: 12px; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
+        .history-right { text-align: right; }
+        .history-pts { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+        .btn-cancel { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 4px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; font-family: 'Prompt', sans-serif; cursor: pointer; transition: all var(--transition); }
+        .btn-cancel:hover { background: var(--danger); color: white; }
+
+        /* ── TOOLBAR ─────────────────────────── */
+        .toolbar { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+        .search-wrap { position: relative; width: 260px; }
+        .search-wrap .material-symbols-outlined { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-light); font-size: 18px; }
+        .search-input { padding: 8px 12px 8px 36px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'Prompt', sans-serif; font-size: 13px; outline: none; width: 100%; background: var(--bg-body); transition: all var(--transition); color: var(--text-main); }
+        .search-input:focus { border-color: var(--accent); background: white; }
+        
+        .toolbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; font-family: 'Prompt', sans-serif; cursor: pointer; transition: all var(--transition); display: inline-flex; align-items: center; gap: 6px; }
+        .btn-action:hover { background: var(--primary-light); }
+        .btn-action-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-action-outline:hover { background: var(--bg-body); border-color: #cbd5e1; }
+        .btn-delete-icon { background: transparent; color: var(--text-muted); border: none; cursor: pointer; transition: all 0.2s; padding: 4px; border-radius: 4px; display:flex; align-items:center; justify-content:center; }
+        .btn-delete-icon:hover { color: var(--danger); background: #fee2e2; }
+        .btn-edit-icon { background: transparent; color: var(--text-muted); border: none; cursor: pointer; transition: all 0.2s; padding: 4px; border-radius: 4px; display:flex; align-items:center; justify-content:center; }
+        .btn-edit-icon:hover { color: var(--accent); background: rgba(201, 150, 63, 0.1); }
+        
+        .filter-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'Prompt', sans-serif; font-size: 12px; background: var(--bg-body); outline: none; cursor: pointer; color: var(--text-main); }
+        .filter-label { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+
+        /* ── TABLES ─────────────────────────── */
+        .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        .data-table th { padding: 12px 16px; text-align: left; background: #f8fafc; font-size: 12px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+        .data-table td { padding: 12px 16px; font-size: 13px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; color: var(--text-main); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover td { background: #f8fafc; }
+        .product-col { display: flex; align-items: center; gap: 12px; }
+        .user-name-col { font-weight: 500; color: var(--text-main); }
+        .emp-id-col { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+        /* ── STATUS BADGES ─────────────────────────── */
+        .badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-PENDING    { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .badge-PROCESSING { background: rgba(201, 150, 63, 0.1); color: #926b27; border: 1px solid rgba(201, 150, 63, 0.3); }
+        .badge-SHIPPED    { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .badge-CANCELLED  { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+        .badge-COMPLETED  { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+
+        .select-status { padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); font-family: 'Prompt', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; outline: none; }
+        
+        /* ── STAT CARDS ─────────────────────────── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 8px; transition: border-color 0.2s; }
+        .stat-card:hover { border-color: #cbd5e1; }
+        .stat-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+        .stat-label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 28px; font-weight: 600; color: var(--text-main); line-height: 1; }
+        .chart-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; height: 350px; }
+        .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+
+        /* ── FORMS ─────────────────────────── */
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'Prompt', sans-serif; font-size: 13px; outline: none; transition: all var(--transition); color: var(--text-main); background: #f8fafc; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--accent); background: white; }
+
+        /* ── EMPTY STATE ─────────────────────────── */
+        .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius); border: 1px dashed #cbd5e1; grid-column: 1 / -1; }
+        .empty-state .material-symbols-outlined { font-size: 40px; margin-bottom: 12px; color: #cbd5e1; }
+        .empty-state p { font-size: 14px; }
+
+        /* ── MODAL ─────────────────────────── */
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 9000; opacity: 0; visibility: hidden; transition: all 0.2s; padding: 20px; }
+        .modal-backdrop.open { opacity: 1; visibility: visible; }
+        .modal-box { background: white; border-radius: var(--radius); padding: 32px; width: 100%; max-width: 400px; text-align: center; transform: translateY(10px); transition: all 0.3s cubic-bezier(0.16,1,0.3,1); max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .modal-backdrop.open .modal-box { transform: translateY(0); }
+        
+        .modal-ico { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .modal-ico.confirm { background: var(--accent-glow); color: var(--accent); }
+        .modal-ico.success { background: #ecfdf5; color: var(--success); }
+        .modal-ico.error   { background: #fef2f2; color: var(--danger); }
+        
+        .modal-heading { font-size: 18px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        .modal-body { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+        .modal-btns { display: flex; gap: 12px; justify-content: center; }
+        .btn-modal { flex: 1; padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 500; font-family: 'Prompt', sans-serif; font-size: 13px; cursor: pointer; border: none; transition: all var(--transition); }
+        .btn-modal-ok  { background: var(--primary); color: white; }
+        .btn-modal-ok:hover  { background: var(--primary-light); }
+        .btn-modal-no  { background: white; color: var(--text-main); border: 1px solid var(--border); }
+        .btn-modal-no:hover  { background: #f1f5f9; }
+
+        /* Product & Bulk form in modal */
+        .modal-form-box { background: white; border-radius: var(--radius); padding: 32px; width: 100%; max-width: 420px; text-align: left; transform: translateY(10px); transition: all 0.3s cubic-bezier(0.16,1,0.3,1); max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); display: none; }
+        .modal-backdrop.open .modal-form-box { transform: translateY(0); }
+        .modal-form-title { font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+
+        /* Custom Scrollbar for inner lists */
+        #bulkUsersList::-webkit-scrollbar { width: 4px; }
+        #bulkUsersList::-webkit-scrollbar-track { background: #f1f5f9; }
+        #bulkUsersList::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        #bulkUsersList::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* ── LOADING ─────────────────────────── */
+        #loadingScreen { position: fixed; inset: 0; background: var(--bg-body); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 16px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+        /* ── SIDEBAR OVERLAY ─────────────────────────── */
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 190; backdrop-filter: blur(1px); }
+
+        /* ── RESPONSIVE ─────────────────────────── */
+        @media (max-width: 1024px) {
+            .main-wrap { margin-left: 0; }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .btn-close-sidebar { display: inline-flex; }
+            .btn-hamburger { display: inline-flex; }
+            .sidebar-overlay.show { display: block; }
+            .main-page { padding: 24px 20px; }
+            .topbar { padding: 0 20px; }
+            .hero-card { padding: 24px; }
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .pts-big { font-size: 28px; }
+            .hero-name { font-size: 20px; }
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .search-wrap { width: 100%; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-actions { justify-content: flex-end; }
+        }
+        @media (max-width: 380px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loadingScreen">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;">
+            <span class="material-symbols-outlined">business_center</span>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:var(--primary);">Corporate Benefits</span>
+    </div>
+    <div class="spinner"></div>
+    <div class="loading-text">กำลังโหลดข้อมูลระบบ...</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div style="display:none;" id="mainApp">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <span class="material-symbols-outlined">card_giftcard</span>
+            </div>
+            <div class="sidebar-brand-text">
+                <div class="title">E-Commerce</div>
+                <div class="sub">Employee Privilege</div>
+            </div>
+            <button class="btn-close-sidebar" id="btnCloseSidebar"><span class="material-symbols-outlined">close</span></button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">พนักงาน (Employee)</div>
+            <a class="nav-item active" id="navShop" onclick="switchTab('shop')">
+                <span class="material-symbols-outlined">storefront</span> แคตตาล็อกสวัสดิการ
+            </a>
+            <a class="nav-item" id="navHistory" onclick="switchTab('history')">
+                <span class="material-symbols-outlined">receipt_long</span> ประวัติการทำรายการ
+            </a>
+            <a class="nav-item" id="navAnnouncements" onclick="switchTab('announcements')">
+                <span class="material-symbols-outlined">campaign</span> ประกาศจากระบบ
+            </a>
+
+            <div class="nav-divider"></div>
+
+            <div id="adminNav" style="display:none;">
+                <div class="nav-section-title">ผู้ดูแลระบบ (Admin)</div>
+                <a class="nav-item" id="navAdminStats" onclick="switchTab('adminStats')">
+                    <span class="material-symbols-outlined">analytics</span> สถิติภาพรวม
+                </a>
+                <a class="nav-item" id="navAdminOrders" onclick="switchTab('adminOrders')">
+                    <span class="material-symbols-outlined">shopping_bag</span> จัดการคำขอแลก
+                </a>
+                <a class="nav-item" id="navAdminProducts" onclick="switchTab('adminProducts')">
+                    <span class="material-symbols-outlined">inventory_2</span> จัดการแคตตาล็อก
+                </a>
+                <a class="nav-item" id="navAdminUsers" onclick="switchTab('adminUsers')">
+                    <span class="material-symbols-outlined">manage_accounts</span> จัดการบัญชีพนักงาน
+                </a>
+                <a class="nav-item" id="navAdminAnnounce" onclick="switchTab('adminAnnounce')">
+                    <span class="material-symbols-outlined">notifications_active</span> จัดการประกาศระบบ
+                </a>
+                <a class="nav-item" id="navAdminAudit" onclick="switchTab('adminAudit')">
+                    <span class="material-symbols-outlined">history_edu</span> ประวัติการจัดการ (Audit)
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-card">
+                <div class="sidebar-avatar"><span class="material-symbols-outlined">person</span></div>
+                <div style="overflow:hidden; flex:1;">
+                    <div class="sidebar-user-name" id="sidebarName">กำลังโหลด...</div>
+                    <div class="sidebar-user-tier" id="sidebarTier">—</div>
+                </div>
+                <button class="btn-logout-icon" id="logoutBtn" title="ออกจากระบบ"><span class="material-symbols-outlined">logout</span></button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrap">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-hamburger" id="btnHamburger"><span class="material-symbols-outlined">menu</span></button>
+                <div class="page-breadcrumb" id="topbarCrumb">
+                    <strong>แคตตาล็อกสวัสดิการ</strong>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-pts" title="คะแนนคงเหลือ">
+                    <span class="material-symbols-outlined">toll</span>
+                    <span class="pts-num" id="topbarPts">0</span> pts
+                </div>
+            </div>
+        </header>
+
+        <main class="main-page">
+
+            <div id="bannerContainer" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;"></div>
+
+            <div class="hero-card">
+                <div class="hero-inner">
+                    <div class="hero-left">
+                        <div class="hero-greeting">ACCOUNT OVERVIEW</div>
+                        <div class="hero-name">
+                            <span id="heroName">กำลังโหลด...</span>
+                            <span class="badge-admin" id="heroBadgeAdmin"><span class="material-symbols-outlined" style="font-size: 14px;">admin_panel_settings</span> ADMIN</span>
+                        </div>
+                        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top: 4px;">
+                            <span class="badge-tier" id="heroTier">—</span>
+                            <span class="hero-meta" id="heroMeta"></span>
+                        </div>
+                    </div>
+                    <div class="hero-right">
+                        <div class="pts-label">Available Balance</div>
+                        <div class="pts-big"><span id="heroPoints">0</span> <span class="pts-unit">pts</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-panel active" id="sectionShop">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title"><span class="material-symbols-outlined">storefront</span> แคตตาล็อกสวัสดิการ</div>
+                        <div class="section-sub">ตรวจสอบระดับสิทธิ์และเลือกแลกสวัสดิการที่ต้องการ</div>
+                    </div>
+                </div>
+                <div class="tier-bar" id="tierBar"></div>
+                <div class="product-grid" id="productContainer"></div>
+            </div>
+
+            <div class="section-panel" id="sectionHistory">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title"><span class="material-symbols-outlined">receipt_long</span> ประวัติการทำรายการ</div>
+                        <div class="section-sub">บันทึกการใช้คะแนนและรับคะแนนทั้งหมดของคุณ</div>
+                    </div>
+                </div>
+                <div class="history-list" id="historyContainer"></div>
+            </div>
+
+            <div class="section-panel" id="sectionAnnouncements">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title"><span class="material-symbols-outlined">campaign</span> ประกาศทั้งหมดจากระบบ</div>
+                        <div class="section-sub">รวบรวมข่าวสารและประกาศที่ผ่านมาทั้งหมด</div>
+                    </div>
+                </div>
+                <div class="history-list" id="announcementsContainer"></div>
+            </div>
+
+            <div class="section-panel" id="sectionAdminStats">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title"><span class="material-symbols-outlined">analytics</span> สถิติภาพรวมระบบ</div>
+                        <div class="section-sub">ข้อมูลสรุปเชิงปริมาณสำหรับการวิเคราะห์</div>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#eff6ff; color: #2563eb;"><span class="material-symbols-outlined">group</span></div>
+                        <div class="stat-label">พนักงานในระบบ</div>
+                        <div class="stat-value" id="statUsers">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:var(--accent-glow); color: var(--accent);"><span class="material-symbols-outlined">toll</span></div>
+                        <div class="stat-label">พอยต์หมุนเวียน</div>
+                        <div class="stat-value" id="statPoints">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#fffbeb; color: #d97706;"><span class="material-symbols-outlined">pending_actions</span></div>
+                        <div class="stat-label">คำขอรอดำเนินการ</div>
+                        <div class="stat-value" id="statPending">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#ecfdf5; color: #059669;"><span class="material-symbols-outlined">check_circle</span></div>
+                        <div class="stat-label">รายการสำเร็จ</div>
+                        <div class="stat-value" id="statRedeemed">0</div>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <div class="chart-title"><span class="material-symbols-outlined">bar_chart</span> ปริมาณคำขอแลกสวัสดิการรายเดือน</div>
+                    <canvas id="orderChart"></canvas>
+                </div>
+            </div>
+
+            <div class="section-panel" id="sectionAdminOrders">
+                <div class="section-header">
+                    <div class="section-title"><span class="material-symbols-outlined">shopping_bag</span> จัดการคำขอแลกสวัสดิการ</div>
+                </div>
+                <div class="toolbar">
+                    <div class="search-wrap">
+                        <span class="material-symbols-outlined">search</span>
+                        <input type="text" id="searchAdminOrder" class="search-input" placeholder="ค้นหาชื่อพนักงาน, สินค้า..." onkeyup="loadAdminOrders()">
+                    </div>
+                    <div class="toolbar-actions">
+                        <span class="filter-label">กรองตามเดือน:</span>
+                        <select id="filterMonth" class="filter-select" onchange="loadAdminOrders()">
+                            <option value="all">ทั้งหมด</option>
+                            <option value="1">ม.ค.</option><option value="2">ก.พ.</option><option value="3">มี.ค.</option>
+                            <option value="4">เม.ย.</option><option value="5">พ.ค.</option><option value="6">มิ.ย.</option>
+                            <option value="7">ก.ค.</option><option value="8">ส.ค.</option><option value="9">ก.ย.</option>
+                            <option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option>
+                        </select>
+                        <select id="filterYear" class="filter-select" onchange="loadAdminOrders()"><option value="all">ทุกปี</option></select>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>วันที่ทำรายการ</th><th>ข้อมูลพนักงาน</th><th>รายการสินค้า</th><th>สถานะ</th></tr></thead>
+                        <tbody id="adminTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-panel" id="sectionAdminProducts">
+                <div class="section-header">
+                    <div class="section-title"><span class="material-symbols-outlined">inventory_2</span> จัดการแคตตาล็อก</div>
+                </div>
+                <div class="toolbar">
+                    <div class="search-wrap">
+                        <span class="material-symbols-outlined">search</span>
+                        <input type="text" id="searchProduct" class="search-input" placeholder="ค้นหาสินค้า..." onkeyup="filterProducts()">
+                    </div>
+                    <div class="toolbar-actions">
+                        <button class="btn-action" onclick="openProductModal()"><span class="material-symbols-outlined" style="font-size:16px;">add</span> เพิ่มรายการ</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>รายการสินค้า</th><th>ระดับสิทธิ์ (Tier)</th><th>มูลค่า (Points)</th><th>คงเหลือ</th><th>การจัดการ</th></tr></thead>
+                        <tbody id="adminProductsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-panel" id="sectionAdminUsers">
+                <div class="section-header">
+                    <div class="section-title"><span class="material-symbols-outlined">manage_accounts</span> จัดการบัญชีพนักงาน</div>
+                </div>
+                <div class="toolbar">
+                    <div class="search-wrap">
+                        <span class="material-symbols-outlined">search</span>
+                        <input type="text" id="searchUser" class="search-input" placeholder="ค้นหาชื่อ, รหัสพนักงาน..." onkeyup="filterUsers()">
+                    </div>
+                    <div class="toolbar-actions">
+                        <button class="btn-action btn-action-outline" onclick="openBulkPointsModal()"><span class="material-symbols-outlined" style="font-size:16px;">group_add</span> ปรับคะแนนกลุ่ม</button>
+                        <button class="btn-action btn-action-outline" onclick="exportUsersCSV()"><span class="material-symbols-outlined" style="font-size:16px;">download</span> ส่งออก CSV</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px; text-align: center;"><input type="checkbox" id="selectAllUsers" onchange="toggleSelectAllUsers(this)" style="cursor:pointer;"></th>
+                                <th>ข้อมูลพนักงาน</th>
+                                <th>ระดับสิทธิ์</th>
+                                <th>คะแนนคงเหลือ</th>
+                                <th>การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUsersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-panel" id="sectionAdminAnnounce">
+                <div class="section-header">
+                    <div class="section-title"><span class="material-symbols-outlined">notifications_active</span> จัดการประกาศระบบ</div>
+                </div>
+                <div class="toolbar">
+                    <div style="flex:1; display:flex; gap:12px;">
+                        <input type="text" id="formAnnounceMsg" class="search-input" placeholder="พิมพ์ข้อความประกาศใหม่ที่นี่..." style="width:100%;">
+                        <button class="btn-action" onclick="addAnnouncement()" style="white-space:nowrap;"><span class="material-symbols-outlined" style="font-size:18px;">add</span> โพสต์ประกาศ</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>วัน/เวลา</th><th>ข้อความประกาศ</th><th>สถานะการแสดงบนแถบ</th><th>จัดการ</th></tr></thead>
+                        <tbody id="adminAnnounceTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-panel" id="sectionAdminAudit">
+                <div class="section-header">
+                    <div class="section-title"><span class="material-symbols-outlined">history_edu</span> ประวัติการจัดการ (Audit Log)</div>
+                </div>
+                <div class="toolbar">
+                    <div class="search-wrap">
+                        <span class="material-symbols-outlined">search</span>
+                        <input type="text" id="searchAuditLog" class="search-input" placeholder="ค้นหาผู้ดูแล, action..." onkeyup="loadAuditLogs()">
+                    </div>
+                    <div class="toolbar-actions">
+                        <span class="filter-label">รอบเดือน:</span>
+                        <select id="filterAuditMonth" class="filter-select" onchange="loadAuditLogs()">
+                            <option value="all">ทั้งหมด</option>
+                            <option value="1">ม.ค.</option><option value="2">ก.พ.</option><option value="3">มี.ค.</option>
+                            <option value="4">เม.ย.</option><option value="5">พ.ค.</option><option value="6">มิ.ย.</option>
+                            <option value="7">ก.ค.</option><option value="8">ส.ค.</option><option value="9">ก.ย.</option>
+                            <option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option>
+                        </select>
+                        <select id="filterAuditYear" class="filter-select" onchange="loadAuditLogs()"><option value="all">ทุกปี</option></select>
+                        <button class="btn-action btn-action-outline" onclick="exportAuditCSV()"><span class="material-symbols-outlined" style="font-size:16px;">download</span> ส่งออก CSV</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>วัน/เวลา</th><th>ผู้ดำเนินการ</th><th>ประเภทกิจกรรม</th><th>รายละเอียด</th></tr></thead>
+                        <tbody id="adminAuditTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div></div>
+    
+<div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-box" id="modalBox">
+        <div class="modal-ico" id="modalIco"></div>
+        <div class="modal-heading" id="modalTitle">หัวข้อ</div>
+        <div class="modal-body" id="modalMessage">ข้อความ</div>
+        <div class="modal-btns" id="modalBtnsConfirm" style="display:none;">
+            <button class="btn-modal btn-modal-no"  id="btnModalNo">ยกเลิก</button>
+            <button class="btn-modal btn-modal-ok"  id="btnModalYes">ยืนยันการทำรายการ</button>
+        </div>
+        <div class="modal-btns" id="modalBtnsAlert" style="display:none;">
+            <button class="btn-modal btn-modal-ok" id="btnModalClose">ตกลง</button>
+        </div>
+    </div>
+    
+    <div class="modal-form-box" id="modalFormBox">
+        <div class="modal-form-title"><span class="material-symbols-outlined">inventory_2</span> เพิ่ม/แก้ไข ข้อมูลสินค้า</div>
+        <input type="hidden" id="formProdId">
+        <div class="form-group"><label>ชื่อรายการสินค้า</label><input type="text" id="formProdName" placeholder="ระบุชื่อสินค้า"></div>
+        <div class="form-group"><label>URL รูปภาพประกอบ</label><input type="text" id="formProdImg" placeholder="https://..."></div>
+        <div style="display:flex; gap:12px;">
+            <div class="form-group" style="flex:1;"><label>มูลค่า (Points)</label><input type="number" id="formProdCost" placeholder="0"></div>
+            <div class="form-group" style="flex:1;"><label>จำนวนคงเหลือ</label><input type="number" id="formProdStock" placeholder="0"></div>
+        </div>
+        <div class="form-group">
+            <label>ระดับสิทธิ์ขั้นต่ำ (Required Tier)</label>
+            <select id="formProdTier">
+                <option value="Bronze">Bronze</option>
+                <option value="Silver">Silver</option>
+                <option value="Gold">Gold</option>
+                <option value="Platinum">Platinum</option>
+                <option value="Diamond">Diamond</option>
+            </select>
+        </div>
+        <div class="modal-btns" style="margin-top:24px;">
+            <button class="btn-modal btn-modal-no" onclick="closeModal()">ยกเลิก</button>
+            <button class="btn-modal btn-modal-ok" onclick="saveProduct()">บันทึกข้อมูล</button>
+        </div>
+    </div>
+    
+    <div class="modal-form-box" id="modalBulkPointsBox" style="max-width: 500px;">
+        <div class="modal-form-title"><span class="material-symbols-outlined">group_add</span> ปรับปรุงคะแนนกลุ่มแบบกำหนดเอง</div>
+        <div style="margin-bottom:16px; font-size:13px; color:var(--text-muted);" id="bulkUserCountText"></div>
+        
+        <div id="bulkUsersList" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; padding-right: 4px;">
+            </div>
+
+        <div class="modal-btns" style="margin-top:24px;">
+            <button class="btn-modal btn-modal-no" onclick="closeModal()">ยกเลิก</button>
+            <button class="btn-modal btn-modal-ok" onclick="saveBulkPoints()">ดำเนินการปรับปรุง</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const supabaseUrl = 'https://oprpllvnuqnyvcmlknnh.supabase.co';
+    const supabaseKey = 'sb_publishable__CFQsicDM4e4RKpcgh4Ctw_SlvQPP5y';
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const TIER_RANK  = { 'Bronze':1,'Silver':2,'Gold':3,'Platinum':4,'Diamond':5 };
+    const STATUS_MAP = { 'PENDING':'รอดำเนินการ','PROCESSING':'เตรียมจัดส่ง','SHIPPED':'จัดส่งแล้ว','CANCELLED':'ยกเลิก','COMPLETED':'เสร็จสิ้น' };
+    const CRUMB_MAP  = { 'shop':'แคตตาล็อกสวัสดิการ','history':'ประวัติการทำรายการ','announcements':'ประกาศทั้งหมดจากระบบ','adminStats':'สถิติภาพรวมระบบ','adminOrders':'จัดการคำขอแลก','adminProducts':'จัดการแคตตาล็อก','adminUsers':'จัดการบัญชีพนักงาน', 'adminAnnounce':'จัดการประกาศระบบ', 'adminAudit':'ประวัติการจัดการ (Audit Log)' };
+
+    let allProducts = [], allUsersData = [], currentAuditData = [];
+    let currentUserId = null, isAdmin = false;
+    let chartInstance = null;
+    let modalCallback = null;
+
+    /* ── UTILS ── */
+    const showLoading = () => document.getElementById('loadingScreen').style.display = 'flex';
+    const hideLoading = () => document.getElementById('loadingScreen').style.display = 'none';
+    function esc(str) { return (str||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+    /* ── AUTH ── */
+    async function checkAuth() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = "index.html"; return; }
+            currentUserId = session.user.id;
+            await loadProfile();
+        } catch(e) {
+            alert("เซสชันผิดพลาด กรุณาเข้าสู่ระบบใหม่");
+            window.location.href = "index.html";
+        }
+    }
+
+    async function loadProfile() {
+        try {
+            const { data: p, error } = await supabaseClient.from('profiles').select('*').eq('id', currentUserId).single();
+            if (error || !p) throw new Error("ไม่พบข้อมูลโปรไฟล์");
+
+            const name  = p.full_name || p.emp_id || 'Employee';
+            const tier  = p.tier || 'Bronze';
+            const pts   = (p.points_balance || 0).toLocaleString();
+
+            document.getElementById('heroName').textContent  = name;
+            document.getElementById('heroTier').textContent  = tier;
+            document.getElementById('heroPoints').textContent = pts;
+            document.getElementById('heroMeta').textContent  = p.emp_id ? `รหัสพนักงาน: ${p.emp_id}` : '';
+            document.getElementById('topbarPts').textContent = pts;
+            document.getElementById('sidebarName').textContent = name;
+            document.getElementById('sidebarTier').textContent = tier;
+
+            isAdmin = p.role === 'admin';
+            if (isAdmin) {
+                document.getElementById('adminNav').style.display = 'block';
+                document.getElementById('heroBadgeAdmin').style.display = 'inline-flex';
+                initYearFilters();
+            }
+
+            // Load banner
+            await loadBannerAnnouncement();
+
+            hideLoading();
+            document.getElementById('mainApp').style.display = 'block';
+
+            await fetchProducts();
+            switchTab('shop');
+        } catch(e) {
+            openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: e.message });
+        }
+    }
+
+    /* ── TAB SWITCHING ── */
+    function switchTab(id) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.section-panel').forEach(el => el.classList.remove('active'));
+
+        const navEl = document.getElementById('nav' + id.charAt(0).toUpperCase() + id.slice(1));
+        const secEl = document.getElementById('section' + id.charAt(0).toUpperCase() + id.slice(1));
+        if (navEl) navEl.classList.add('active');
+        if (secEl) secEl.classList.add('active');
+
+        document.getElementById('topbarCrumb').innerHTML = `<strong>${CRUMB_MAP[id]||''}</strong>`;
+
+        if (id === 'history')       loadTransactionHistory();
+        if (id === 'announcements') loadUserAnnouncements();
+        
+        if (isAdmin) {
+            if (id === 'adminStats')    loadDashboardStats();
+            if (id === 'adminOrders')   loadAdminOrders();
+            if (id === 'adminUsers')    loadAdminUsers();
+            if (id === 'adminProducts') loadAdminProducts();
+            if (id === 'adminAnnounce') loadAdminAnnouncements();
+            if (id === 'adminAudit')    loadAuditLogs();
+        }
+
+        if (window.innerWidth <= 1024) document.getElementById('sidebar').classList.remove('open');
+    }
+
+    /* ── ANNOUNCEMENTS ── */
+    async function loadBannerAnnouncement() {
+        const container = document.getElementById('bannerContainer');
+        container.innerHTML = '';
+        try {
+            // ดึงประกาศทั้งหมดที่ถูกเปิดใช้งาน
+            const { data, error } = await supabaseClient.from('announcements')
+                .select('*').eq('is_active', true).order('created_at', { ascending: false });
+                
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                data.forEach(announce => {
+                    container.innerHTML += `
+                    <div class="notification-banner" style="margin-bottom: 0;">
+                        <span class="material-symbols-outlined">campaign</span>
+                        <div style="flex: 1;"><strong style="font-weight: 600;">ประกาศจากระบบ: </strong> <span>${esc(announce.message)}</span></div>
+                    </div>`;
+                });
+            }
+        } catch (e) {
+            console.error("Error loading banners:", e);
+        }
+    }
+    
+    async function loadUserAnnouncements() {
+        const c = document.getElementById('announcementsContainer');
+        c.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined">hourglass_empty</span><p>กำลังโหลดข้อมูล...</p></div>';
+        try {
+            const { data, error } = await supabaseClient.from('announcements').select('*').order('created_at', { ascending: false });
+            if (error) throw error;
+            c.innerHTML = '';
+            
+            if (!data || !data.length) { 
+                c.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined">campaign</span><p>ยังไม่มีประกาศจากระบบในขณะนี้</p></div>'; 
+                return; 
+            }
+            
+            data.forEach(item => {
+                const date = new Date(item.created_at).toLocaleString('th-TH');
+                c.innerHTML += `
+                <div class="history-item">
+                    <div class="history-left">
+                        <div class="history-thumb-icon" style="color:var(--accent); background:var(--accent-glow); border-color:transparent;"><span class="material-symbols-outlined">campaign</span></div>
+                        <div>
+                            <div class="history-name" style="font-size:15px; margin-bottom:4px;">${esc(item.message)}</div>
+                            <div class="history-date"><span class="material-symbols-outlined" style="font-size:14px;">calendar_today</span> ${date}</div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        } catch(e) {
+            c.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined" style="color:var(--danger)">error</span><p>Error: ${e.message}</p></div>`;
+        }
+    }
+
+    async function loadAdminAnnouncements() {
+        const tbody = document.getElementById('adminAnnounceTableBody');
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)"><span class="material-symbols-outlined" style="display:block;font-size:32px;margin-bottom:8px;color:#cbd5e1;">hourglass_empty</span> กำลังโหลดข้อมูล...</td></tr>';
+        
+        try {
+            const { data, error } = await supabaseClient.from('announcements').select('*').order('created_at', { ascending: false });
+            if (error) throw error;
+            
+            tbody.innerHTML = '';
+            if (!data || !data.length) { 
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)"><span class="material-symbols-outlined" style="display:block;font-size:32px;margin-bottom:8px;color:#cbd5e1;">search_off</span> ยังไม่มีประกาศในระบบ</td></tr>'; 
+                return; 
+            }
+            
+            data.forEach(item => {
+                const date = new Date(item.created_at).toLocaleString('th-TH');
+                const isChecked = item.is_active ? 'checked' : '';
+                tbody.innerHTML += `
+                <tr>
+                    <td style="color:var(--text-muted); font-size:12px; white-space:nowrap;">${date}</td>
+                    <td style="max-width:350px; white-space:normal; line-height:1.5;">${esc(item.message)}</td>
+                    <td>
+                        <label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-size:13px; color:var(--text-main);">
+                            <input type="checkbox" ${isChecked} onchange="toggleAnnounceStatus('${item.id}', this.checked)" style="accent-color:var(--accent); width:16px; height:16px; cursor:pointer;"> 
+                            เปิดแสดงผล
+                        </label>
+                    </td>
+                    <td>
+                        <button class="btn-delete-icon" onclick="deleteAnnouncement('${item.id}')" title="ลบประกาศ"><span class="material-symbols-outlined">delete</span></button>
+                    </td>
+                </tr>`;
+            });
+        } catch(e) {
+            tbody.innerHTML = `<tr><td colspan="4" style="color:var(--danger);text-align:center;padding:20px;">เกิดข้อผิดพลาด: ${e.message}</td></tr>`;
+        }
+    }
+
+    async function addAnnouncement() {
+        const msg = document.getElementById('formAnnounceMsg').value.trim();
+        if(!msg) {
+            openModal({ type: 'error', title: 'ข้อมูลไม่ครบถ้วน', message: 'กรุณาพิมพ์ข้อความประกาศ' });
+            return;
+        }
+        
+        showLoading();
+        try {
+            await supabaseClient.from('announcements').insert([{ message: msg, is_active: true }]);
+            logAudit('สร้างประกาศ', `เพิ่มประกาศใหม่: ${msg.substring(0, 30)}...`);
+            
+            document.getElementById('formAnnounceMsg').value = '';
+            await loadAdminAnnouncements();
+            await loadBannerAnnouncement();
+            
+            openModal({ type:'success', title:'บันทึกข้อมูลสำเร็จ', message:'สร้างและเผยแพร่ประกาศระบบเรียบร้อยแล้ว' });
+        } catch(e) {
+            openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: 'ไม่สามารถสร้างประกาศได้: ' + e.message });
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    async function toggleAnnounceStatus(id, isActive) {
+        try {
+            await supabaseClient.from('announcements').update({ is_active: isActive }).eq('id', id);
+            await loadBannerAnnouncement();
+        } catch(e) {
+            openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: 'ไม่สามารถปรับสถานะได้: ' + e.message });
+            loadAdminAnnouncements();
+        }
+    }
+    
+    function deleteAnnouncement(id) {
+        openModal({
+            type:'confirm', title:'ยืนยันการลบประกาศ', message:`ต้องการลบประกาศนี้ออกจากระบบอย่างถาวรหรือไม่? พนักงานจะไม่สามารถดูย้อนหลังได้อีก`,
+            onConfirm: async () => {
+                showLoading();
+                try {
+                    await supabaseClient.from('announcements').delete().eq('id', id);
+                    logAudit('ลบประกาศ', `นำประกาศออกจากระบบ`);
+                    
+                    await loadAdminAnnouncements();
+                    await loadBannerAnnouncement();
+                    
+                } catch(e) { openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: 'ไม่สามารถลบประกาศได้: ' + e.message }); }
+                finally { hideLoading(); }
+            }
+        });
+    }
+
+    /* ── PRODUCTS (Shop) ── */
+    async function fetchProducts() {
+        try {
+            const { data, error } = await supabaseClient.from('products').select('*').order('points_cost');
+            if (error) throw error;
+            allProducts = data || [];
+            renderTierBar();
+        } catch(e) { console.error("Fetch products:", e); }
+    }
+
+    function renderTierBar() {
+        const bar = document.getElementById('tierBar'); bar.innerHTML = '';
+        const myTierText = document.getElementById('heroTier').textContent.trim();
+        const myTierRank = TIER_RANK[myTierText] || 1;
+        const userTier = Object.keys(TIER_RANK).find(t => TIER_RANK[t] === myTierRank) || 'Bronze';
+
+        for (const tName of Object.keys(TIER_RANK)) {
+            const btn = document.createElement('button');
+            btn.className = `tier-tab${tName===userTier?' active':''}`;
+            btn.innerHTML = tName;
+            btn.onclick = () => {
+                document.querySelectorAll('.tier-tab').forEach(t => t.classList.remove('active'));
+                btn.classList.add('active');
+                renderProductsForTier(tName);
+            };
+            bar.appendChild(btn);
+        }
+        renderProductsForTier(userTier);
+    }
+
+    function renderProductsForTier(tier) {
+        const container = document.getElementById('productContainer'); container.innerHTML = '';
+        const pts = parseInt(document.getElementById('heroPoints').textContent.replace(/,/g,''));
+        
+        const myTierText = document.getElementById('heroTier').textContent.trim();
+        const myTierRank = TIER_RANK[myTierText] || 1;
+
+        const list = allProducts.filter(p => (p.required_tier||'Bronze') === tier);
+
+        if (!list.length) {
+            container.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined">inventory_2</span><p>ไม่มีรายการสินค้าในระดับสิทธิ์นี้</p></div>';
+            return;
+        }
+        list.forEach(p => {
+            const reqTierRank = TIER_RANK[p.required_tier || 'Bronze'] || 1;
+            
+            let disabled = '';
+            let btnText = 'ดำเนินการแลก';
+
+            if (reqTierRank > myTierRank) {
+                disabled = 'disabled';
+                btnText = `สิทธิ์ ${p.required_tier} ขึ้นไป`;
+            } else if (p.stock <= 0) {
+                disabled = 'disabled';
+                btnText = 'สินค้าหมด';
+            } else if (pts < p.points_cost) {
+                disabled = 'disabled';
+                btnText = 'คะแนนไม่พอ';
+            }
+
+            const imgHtml = p.image_url 
+                ? `<img src="${p.image_url}" class="product-img" loading="lazy" alt="Product Image">` 
+                : `<span class="material-symbols-outlined" style="font-size:40px;color:var(--text-light)">image</span>`;
+
+            container.innerHTML += `
+            <div class="product-card">
+                <div class="product-img-wrap">${imgHtml}</div>
+                <div class="product-name">${esc(p.name)}</div>
+                <div class="product-cost"><span class="material-symbols-outlined">toll</span> ${p.points_cost.toLocaleString()} pts</div>
+                <div class="product-stock"><span class="material-symbols-outlined">inventory</span> คงเหลือ: ${p.stock} รายการ</div>
+                <div class="action-row">
+                    <input type="number" class="qty-input" id="qty_${p.id}" value="1" min="1" max="${p.stock}" ${disabled} title="จำนวน">
+                    <button class="btn-redeem" ${disabled} onclick="redeemProduct('${p.id}','${esc(p.name)}',${p.points_cost},'${p.required_tier||'Bronze'}', document.getElementById('qty_${p.id}').value)">${btnText}</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    /* ── REDEEM ── */
+    async function redeemProduct(productId, productName, pointsCost, requiredTier, qtyStr) {
+        const qty = parseInt(qtyStr) || 1;
+        if (qty < 1) { openModal({ type:'error', title:'ข้อมูลไม่ถูกต้อง', message:'กรุณาระบุจำนวนที่ต้องการแลกอย่างน้อย 1 รายการ' }); return; }
+        const totalPointsCost = pointsCost * qty;
+
+        const myTierText = document.getElementById('heroTier').textContent.trim();
+        const myTierRank = TIER_RANK[myTierText] || 1;
+        const reqTierRank = TIER_RANK[requiredTier || 'Bronze'] || 1;
+
+        if (reqTierRank > myTierRank) {
+            openModal({ type: 'error', title: 'ระดับสิทธิ์ไม่เพียงพอ', message: `รายการนี้สงวนสิทธิ์เฉพาะพนักงานระดับ ${requiredTier} ขึ้นไป` });
+            return;
+        }
+
+        openModal({
+            type: 'confirm',
+            title: 'ยืนยันการทำรายการ',
+            message: `ยืนยันการใช้คะแนนสะสม <strong style="color:var(--text-main)">${totalPointsCost.toLocaleString()} pts</strong><br>เพื่อแลกรับ <strong>${productName}</strong> จำนวน ${qty} รายการ?`,
+            onConfirm: async () => {
+                showLoading();
+                try {
+                    const { data: profile } = await supabaseClient.from('profiles').select('points_balance, tier').eq('id', currentUserId).single();
+                    const actualTierRank = TIER_RANK[profile.tier || 'Bronze'] || 1;
+                    
+                    if (reqTierRank > actualTierRank) throw new Error(`ระดับสิทธิ์ต้องเป็น ${requiredTier} ขึ้นไป`);
+                    if (profile.points_balance < totalPointsCost) throw new Error("คะแนนสะสมไม่เพียงพอ");
+                    
+                    const { data: product } = await supabaseClient.from('products').select('stock').eq('id', productId).single();
+                    if (product.stock < qty) throw new Error("สินค้าคงเหลือไม่เพียงพอ");
+
+                    await supabaseClient.from('profiles').update({ points_balance: profile.points_balance - totalPointsCost }).eq('id', currentUserId);
+                    await supabaseClient.from('products').update({ stock: product.stock - qty }).eq('id', productId);
+                    
+                    const inserts = [];
+                    for(let i = 0; i < qty; i++) {
+                        inserts.push({ user_id: currentUserId, action_type:'REDEEM', points_changed: -pointsCost, product_id: productId, status:'PENDING' });
+                    }
+                    await supabaseClient.from('transactions').insert(inserts);
+
+                    await loadProfile();
+                    openModal({ type:'success', title:'ทำรายการสำเร็จ', message:'บันทึกคำขอแลกสวัสดิการเรียบร้อยแล้ว สถานะรอดำเนินการ' });
+                } catch(e) { openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: e.message }); }
+                finally { hideLoading(); }
+            }
+        });
+    }
+
+    /* ── CANCEL ORDER ── */
+    async function cancelOrder(tId, pId, pts, pName) {
+        openModal({
+            type: 'confirm',
+            title: 'ยืนยันการยกเลิกคำขอ',
+            message: `คุณต้องการยกเลิกคำขอ <strong>"${pName}"</strong> ใช่หรือไม่?<br>ระบบจะคืนคะแนนสะสมจำนวน <strong style="color:var(--success)">${pts.toLocaleString()} pts</strong> เข้าสู่บัญชี`,
+            onConfirm: async () => {
+                showLoading();
+                try {
+                    const { data: tx } = await supabaseClient.from('transactions').select('status').eq('id', tId).single();
+                    if (tx.status !== 'PENDING') throw new Error("คำขอนี้ถูกดำเนินการไปแล้ว ไม่สามารถยกเลิกได้");
+                    
+                    const { data: profile } = await supabaseClient.from('profiles').select('points_balance').eq('id', currentUserId).single();
+                    if (pId) { 
+                        const { data: pr } = await supabaseClient.from('products').select('stock').eq('id', pId).single(); 
+                        if(pr) await supabaseClient.from('products').update({ stock: pr.stock + 1 }).eq('id', pId); 
+                    }
+                    await supabaseClient.from('profiles').update({ points_balance: profile.points_balance + pts }).eq('id', currentUserId);
+                    await supabaseClient.from('transactions').update({ status:'CANCELLED' }).eq('id', tId);
+                    
+                    await loadProfile(); 
+                    await loadTransactionHistory();
+                    openModal({ type:'success', title:'ยกเลิกสำเร็จ', message:'ยกเลิกคำขอและคืนคะแนนเข้าสู่ระบบเรียบร้อยแล้ว' });
+                } catch(e) { openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: e.message }); }
+                finally { hideLoading(); }
+            }
+        });
+    }
+
+    /* ── AUDIT LOG ── */
+    async function logAudit(action, details) {
+        if (!isAdmin) return;
+        try { await supabaseClient.from('audit_logs').insert([{ admin_id: currentUserId, action, details }]); }
+        catch(e) { console.error("Audit log error:", e); }
+    }
+
+    /* ── ADMIN STATS ── */
+    async function loadDashboardStats() {
+        try {
+            const { count: uCount } = await supabaseClient.from('profiles').select('*', { count:'exact', head:true });
+            const { data: profs }   = await supabaseClient.from('profiles').select('points_balance');
+            const totalPts = (profs||[]).reduce((s,p) => s+(p.points_balance||0), 0);
+            const { count: pCount } = await supabaseClient.from('transactions').select('*', { count:'exact', head:true }).eq('status','PENDING');
+            const { count: rCount } = await supabaseClient.from('transactions').select('*', { count:'exact', head:true }).eq('action_type','REDEEM');
+
+            document.getElementById('statUsers').textContent   = (uCount||0).toLocaleString();
+            document.getElementById('statPoints').textContent  = totalPts.toLocaleString();
+            document.getElementById('statPending').textContent = pCount||0;
+            document.getElementById('statRedeemed').textContent= rCount||0;
+
+            const { data: txs } = await supabaseClient.from('transactions').select('created_at').eq('action_type','REDEEM');
+            let mc = Array(12).fill(0);
+            (txs||[]).forEach(t => mc[new Date(t.created_at).getMonth()]++);
+
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(document.getElementById('orderChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],
+                    datasets: [{ label:'ปริมาณคำขอ', data: mc, backgroundColor: '#c9963f', borderRadius: 4, borderSkipped: false }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        } catch(e) { console.error("Stats Error:", e); }
+    }
+
+    /* ── ADMIN ORDERS ── */
+    async function loadAdminOrders() {
+        if (!isAdmin) return;
+        const tbody = document.getElementById('adminTableBody');
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)"><span class="material-symbols-outlined" style="display:block;font-size:32px;margin-bottom:8px;color:#cbd5e1;">hourglass_empty</span> กำลังประมวลผลข้อมูล...</td></tr>';
+
+        const fM = document.getElementById('filterMonth').value;
+        const fY = document.getElementById('filterYear').value;
+        const st = document.getElementById('searchAdminOrder').value.toLowerCase().trim();
+
+        let q = supabaseClient.from('transactions')
+            .select('id,created_at,status,action_type,profiles(full_name,emp_id),products(name)')
+            .eq('action_type','REDEEM').order('created_at', { ascending: false });
+
+        if (fY !== 'all') {
+            const sm = fM !== 'all' ? new Date(fY, fM-1, 1).toISOString() : new Date(fY, 0, 1).toISOString();
+            const em = fM !== 'all' ? new Date(fY, fM, 1).toISOString()   : new Date(parseInt(fY)+1, 0, 1).toISOString();
+            q = q.gte('created_at', sm).lt('created_at', em);
+        }
+        try {
+            const { data, error } = await q; if (error) throw error;
+            let rows = data || [];
+            if (fY === 'all' && fM !== 'all') rows = rows.filter(r => (new Date(r.created_at).getMonth()+1).toString() === fM);
+            if (st) rows = rows.filter(r => [(r.profiles?.full_name||''),(r.profiles?.emp_id||''),(r.products?.name||'')].join(' ').toLowerCase().includes(st));
+
+            tbody.innerHTML = '';
+            if (!rows.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)"><span class="material-symbols-outlined" style="display:block;font-size:32px;margin-bottom:8px;color:#cbd5e1;">search_off</span> ไม่พบข้อมูลคำขอในระบบ</td></tr>'; return; }
+
+            rows.forEach(item => {
+                const date = new Date(item.created_at).toLocaleString('th-TH');
+                const sCls = `select-status badge-${item.status||'PENDING'}`;
+                tbody.innerHTML += `
+                <tr>
+                    <td style="color:var(--text-muted); font-size:12px;">${date}</td>
+                    <td>
+                        <div class="user-name-col">${esc(item.profiles?.full_name||'ไม่มีข้อมูลระบุ')}</div>
+                        <div class="emp-id-col">${item.profiles?.emp_id||''}</div>
+                    </td>
+                    <td style="font-weight:500;">${esc(item.products?.name||'สินค้าถูกลบ')}</td>
+                    <td>
+                        <select class="${sCls}" onchange="updateOrderStatus('${item.id}', this)" ${item.status==='CANCELLED'?'disabled':''}>
+                            <option value="PENDING"    ${item.status==='PENDING'   ?'selected':''}>รอดำเนินการ</option>
+                            <option value="PROCESSING" ${item.status==='PROCESSING'?'selected':''}>เตรียมจัดส่ง</option>
+                            <option value="SHIPPED"    ${item.status==='SHIPPED'   ?'selected':''}>จัดส่งแล้ว</option>
+                            <option value="COMPLETED"  ${item.status==='COMPLETED' ?'selected':''}>เสร็จสิ้น</option>
+                            <option value="CANCELLED"  ${item.status==='CANCELLED' ?'selected':''}>ยกเลิก</option>
+                        </select>
+                    </td>
+                </tr>`;
+            });
+        } catch(e) { tbody.innerHTML = `<tr><td colspan="4" style="color:var(--danger);text-align:center;padding:20px;">เกิดข้อผิดพลาด: ${e.message}</td></tr>`; }
+    }
+
+    async function updateOrderStatus(tId, selectEl) {
+        const val = selectEl.value;
+        selectEl.disabled = true;
+        try {
+            const { data: tx, error: txErr } = await supabaseClient.from('transactions').select('user_id, points_changed, product_id, status').eq('id', tId).single();
+            if (txErr) throw txErr;
+
+            if (val === 'CANCELLED' && tx.status !== 'CANCELLED') {
+                const pts = Math.abs(tx.points_changed);
+                const { data: profile } = await supabaseClient.from('profiles').select('points_balance').eq('id', tx.user_id).single();
+                if (profile) {
+                    await supabaseClient.from('profiles').update({ points_balance: profile.points_balance + pts }).eq('id', tx.user_id);
+                }
+                if (tx.product_id) {
+                    const { data: pr } = await supabaseClient.from('products').select('stock').eq('id', tx.product_id).single();
+                    if (pr) {
+                        await supabaseClient.from('products').update({ stock: pr.stock + 1 }).eq('id', tx.product_id);
+                    }
+                }
+            }
+
+            const { error } = await supabaseClient.from('transactions').update({ status: val }).eq('id', tId);
+            if (error) throw error;
+            
+            selectEl.className = `select-status badge-${val}`;
+            logAudit('อัปเดตสถานะคำขอ', `ปรับสถานะรายการ ID ${tId} เป็น ${val}`);
+            if (val !== 'CANCELLED') selectEl.disabled = false;
+            openModal({ type:'success', title:'บันทึกข้อมูลสำเร็จ', message:'ปรับปรุงสถานะรายการเรียบร้อยแล้ว' });
+        } catch(e) { 
+            openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: e.message }); 
+            selectEl.disabled = false; 
+            loadAdminOrders();
+        }
+    }
+
+    /* ── ADMIN PRODUCTS ── */
+    function loadAdminProducts() { filterProducts(); }
+    function filterProducts() {
+        const q = document.getElementById('searchProduct').value.toLowerCase();
+        const tbody = document.getElementById('adminProductsTableBody'); tbody.innerHTML = '';
+        allProducts.filter(p => p.name.toLowerCase().includes(q)).forEach(p => {
+            const imgHtml = p.image_url 
+                ? `<img src="${p.image_url}" style="width:36px;height:36px;object-fit:contain;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;">`
+                : `<div style="width:36px;height:36px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#94a3b8;flex-shrink:0;"><span class="material-symbols-outlined" style="font-size:18px;">image</span></div>`;
+            
+            tbody.innerHTML += `
+            <tr>
+                <td><div class="product-col">
+                    ${imgHtml}
+                    <span style="font-weight:500;">${esc(p.name)}</span>
+                </div></td>
+                <td><span class="badge" style="background:#f1f5f9;color:var(--text-muted);border:1px solid #e2e8f0;">${p.required_tier}</span></td>
+                <td style="color:var(--text-main);font-weight:600;">${p.points_cost.toLocaleString()}</td>
+                <td>${p.stock}</td>
+                <td><div style="display:flex;gap:4px;">
+                    <button class="btn-edit-icon" onclick="editProduct('${p.id}')" title="แก้ไข"><span class="material-symbols-outlined">edit</span></button>
+                    <button class="btn-delete-icon" onclick="deleteProduct('${p.id}','${esc(p.name)}')" title="ลบข้อมูล"><span class="material-symbols-outlined">delete</span></button>
+                </div></td>
+            </tr>`;
+        });
+    }
+
+    function openProductModal() {
+        document.getElementById('modalBox').style.display = 'none';
+        document.getElementById('modalBulkPointsBox').style.display = 'none';
+        document.getElementById('modalFormBox').style.display = 'block';
+        ['formProdId','formProdName','formProdImg','formProdCost','formProdStock'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('modalBackdrop').classList.add('open');
+    }
+    function editProduct(id) {
+        const p = allProducts.find(x => x.id === id);
+        document.getElementById('formProdId').value    = p.id;
+        document.getElementById('formProdName').value  = p.name;
+        document.getElementById('formProdImg').value   = p.image_url;
+        document.getElementById('formProdCost').value  = p.points_cost;
+        document.getElementById('formProdStock').value = p.stock;
+        document.getElementById('formProdTier').value  = p.required_tier;
+        document.getElementById('modalBox').style.display = 'none';
+        document.getElementById('modalBulkPointsBox').style.display = 'none';
+        document.getElementById('modalFormBox').style.display = 'block';
+        document.getElementById('modalBackdrop').classList.add('open');
+    }
+    async function saveProduct() {
+        const id = document.getElementById('formProdId').value;
+        const payload = {
+            name: document.getElementById('formProdName').value,
+            image_url: document.getElementById('formProdImg').value,
+            points_cost: parseInt(document.getElementById('formProdCost').value)||0,
+            stock: parseInt(document.getElementById('formProdStock').value)||0,
+            required_tier: document.getElementById('formProdTier').value
+        };
+        showLoading();
+        try {
+            if (id) { await supabaseClient.from('products').update(payload).eq('id', id); logAudit('ปรับปรุงสินค้า', `อัปเดตข้อมูล "${payload.name}"`); }
+            else     { await supabaseClient.from('products').insert([payload]);             logAudit('เพิ่มสินค้า', `นำเข้า "${payload.name}"`); }
+            closeModal(); await fetchProducts(); loadAdminProducts();
+        } catch(e) { openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: 'ไม่สามารถบันทึกข้อมูลได้: ' + e.message }); }
+        finally { hideLoading(); }
+    }
+    function deleteProduct(id, name) {
+        openModal({
+            type:'confirm', title:'ยืนยันการลบข้อมูล', message:`ต้องการลบรายการสินค้า <b>"${name}"</b> ออกจากระบบอย่างถาวรหรือไม่?`,
+            onConfirm: async () => {
+                showLoading();
+                try {
+                    await supabaseClient.from('products').delete().eq('id', id);
+                    logAudit('ลบสินค้า', `นำ "${name}" ออกจากระบบ`);
+                    await fetchProducts(); loadAdminProducts();
+                } catch(e) { openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: 'ไม่สามารถลบข้อมูลได้: ' + e.message }); }
+                finally { hideLoading(); }
+            }
+        });
+    }
+
+    /* ── ADMIN USERS ── */
+    async function loadAdminUsers() {
+        try {
+            const { data, error } = await supabaseClient.from('profiles').select('*').order('full_name');
+            if (error) throw error;
+            allUsersData = data || []; filterUsers();
+        } catch(e) { console.error("Load users:", e); }
+    }
+    function filterUsers() {
+        const q = document.getElementById('searchUser').value.toLowerCase();
+        const tbody = document.getElementById('adminUsersTableBody'); tbody.innerHTML = '';
+        allUsersData.filter(u => (u.full_name||'').toLowerCase().includes(q) || (u.emp_id||'').toLowerCase().includes(q)).forEach(u => {
+            tbody.innerHTML += `
+            <tr>
+                <td style="text-align: center;"><input type="checkbox" class="user-select-chk" value="${u.id}" data-name="${esc(u.full_name)}" style="cursor:pointer;"></td>
+                <td>
+                    <div class="user-name-col">${esc(u.full_name)||'ไม่มีชื่อในระบบ'}</div>
+                    <div class="emp-id-col">${u.emp_id||'-'}</div>
+                </td>
+                <td>
+                    <select class="filter-select" onchange="updateTier('${u.id}','${esc(u.full_name)}',this.value,this)">
+                        ${Object.keys(TIER_RANK).map(t=>`<option value="${t}" ${u.tier===t?'selected':''}>${t}</option>`).join('')}
+                    </select>
+                </td>
+                <td style="color:var(--text-main);font-weight:600;">${(u.points_balance||0).toLocaleString()}</td>
+                <td>
+                    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                        <input type="number" id="pts_${u.id}" placeholder="±pts" style="width:70px;padding:6px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px;outline:none;background:#f8fafc;">
+                        <button class="btn-action" style="padding:6px 12px; font-size:11px;" onclick="addPoints('${u.id}','${esc(u.full_name)}')">บันทึก</button>
+                        <button class="btn-delete-icon" onclick="deleteUser('${u.id}','${esc(u.full_name)}')" title="ลบบัญชี"><span class="material-symbols-outlined" style="font-size:18px;">person_remove</span></button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+    }
+    function toggleSelectAllUsers(master) {
+        const chks = document.querySelectorAll('.user-select-chk');
+        chks.forEach(chk => chk.checked = master.checked);
+    }
+    
+    /* ── BULK POINTS ADJUSTMENT ── */
+    function openBulkPointsModal() {
+        const selectedChks = document.querySelectorAll('.user-select-chk:checked');
+        if (selectedChks.length === 0) {
+            openModal({ type: 'error', title: 'ไม่พบเป้าหมาย', message: 'กรุณาเลือกพนักงานในตารางอย่างน้อย 1 รายการก่อนดำเนินการ' });
+            return;
+        }
+        
+        document.getElementById('modalBox').style.display = 'none';
+        document.getElementById('modalFormBox').style.display = 'none';
+        document.getElementById('modalBulkPointsBox').style.display = 'block';
+        
+        document.getElementById('bulkUserCountText').innerHTML = `พนักงานที่เลือก: <b>${selectedChks.length}</b> รายการ <br><small style="color:var(--text-light);">ระบุค่าว่างสำหรับรายการที่ไม่ต้องการประมวลผล</small>`;
+        
+        const listContainer = document.getElementById('bulkUsersList');
+        listContainer.innerHTML = '';
+        
+        selectedChks.forEach(chk => {
+            const uid = chk.value;
+            const uname = chk.getAttribute('data-name') || 'ไม่ระบุชื่อ';
+            listContainer.innerHTML += `
+                <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                    <span style="font-size: 13px; font-weight: 500; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;" title="${uname}">${uname}</span>
+                    <input type="number" class="bulk-user-pts-input" data-uid="${uid}" placeholder="±pts" style="width: 80px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); font-family: 'Prompt'; font-size: 12px; outline: none; text-align: center;">
+                </div>
+            `;
+        });
+        
+        document.getElementById('modalBackdrop').classList.add('open');
+    }
+    
+    async function saveBulkPoints() {
+        const inputs = document.querySelectorAll('.bulk-user-pts-input');
+        const updates = [];
+        let hasValidInput = false;
+
+        inputs.forEach(input => {
+            const val = parseInt(input.value);
+            if (!isNaN(val) && val !== 0) {
+                hasValidInput = true;
+                updates.push({ uid: input.getAttribute('data-uid'), val: val });
+            }
+        });
+
+        if (!hasValidInput) {
+            alert("กรุณาระบุคะแนนที่ต้องการปรับปรุงอย่างน้อย 1 รายการ (ใช้ค่าติดลบเพื่อหักลด)");
+            return;
+        }
+        
+        closeModal();
+        showLoading();
+        
+        let successCount = 0;
+        let failCount = 0;
+        
+        try {
+            for (let item of updates) {
+                const uid = item.uid;
+                const val = item.val;
+                
+                try {
+                    const { data: user, error: fErr } = await supabaseClient.from('profiles').select('points_balance').eq('id', uid).single();
+                    if (fErr || !user) throw new Error("ไม่พบข้อมูลอ้างอิง");
+                    
+                    const newPts = (user.points_balance || 0) + val;
+                    if (newPts < 0) throw new Error("คะแนนสะสมคงเหลือต่ำกว่าศูนย์");
+                    
+                    await supabaseClient.from('profiles').update({ points_balance: newPts }).eq('id', uid);
+                    await supabaseClient.from('transactions').insert([{ 
+                        user_id: uid, 
+                        action_type: val > 0 ? 'EARN' : 'DEDUCT', 
+                        points_changed: val, 
+                        status: 'COMPLETED' 
+                    }]);
+                    successCount++;
+                } catch(err) {
+                    console.error("Bulk point update failed for ID: " + uid, err);
+                    failCount++;
+                }
+            }
+            
+            logAudit('ปรับปรุงคะแนนแบบกลุ่ม', `ดำเนินการเสร็จสิ้น: สำเร็จ ${successCount}, ผิดพลาด ${failCount}`);
+            await loadAdminUsers();
+            await loadProfile();
+            
+            openModal({ 
+                type: 'success', 
+                title: 'ประมวลผลเสร็จสิ้น', 
+                message: `ปรับปรุงคะแนนระบบเรียบร้อย<br>รายการสำเร็จ: ${successCount} <br>รายการผิดพลาด: ${failCount}` 
+            });
+            
+            document.getElementById('selectAllUsers').checked = false;
+        } catch(e) {
+            openModal({ type: 'error', title: 'เกิดข้อผิดพลาด', message: e.message });
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    async function updateTier(userId, userName, newTier, el) {
+        const oldTier = allUsersData.find(u => u.id === userId)?.tier || 'Bronze';
+        el.value = oldTier;
+        openModal({
+            type:'confirm', title:'ยืนยันการปรับระดับสิทธิ์',
+            message: `ยืนยันการปรับระดับสิทธิ์พนักงาน <b>${userName}</b><br>จาก ${oldTier} เป็น <span style="color:var(--accent); font-weight:600;">${newTier}</span> ใช่หรือไม่?`,
+            onConfirm: async () => {
+                showLoading();
+                try {
+                    await supabaseClient.from('profiles').update({ tier: newTier }).eq('id', userId);
+                    logAudit('แก้ไขระดับสิทธิ์พนักงาน', `ปรับสิทธิ์บัญชี "${userName}" เป็น ${newTier}`);
+                    const ui = allUsersData.findIndex(u => u.id === userId); if(ui !== -1) allUsersData[ui].tier = newTier;
+                    el.value = newTier;
+                    if (userId === currentUserId) await loadProfile();
+                    openModal({ type:'success', title:'บันทึกข้อมูลสำเร็จ', message:'ปรับปรุงข้อมูลระบบเสร็จสมบูรณ์' });
+                } catch(e) { openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: e.message }); }
+                finally { hideLoading(); }
+            }
+        });
+    }
+    
+    async function addPoints(userId, userName) {
+        const val = parseInt(document.getElementById(`pts_${userId}`).value);
+        if (!val) { openModal({ type:'error', title:'ข้อมูลไม่สมบูรณ์', message:'กรุณาระบุคะแนนที่ต้องการเพิ่มหรือลด' }); return; }
+        const user = allUsersData.find(u => u.id === userId);
+        const newPts = user.points_balance + val;
+        if (newPts < 0) { openModal({ type:'error', title:'เกิดข้อผิดพลาด', message:'คะแนนสะสมไม่สามารถติดลบได้' }); return; }
+        openModal({
+            type:'confirm', title:'ยืนยันการปรับปรุงคะแนน',
+            message:`ต้องการ${val>0?'เพิ่ม':'หักลด'}คะแนนบัญชี <b>${userName}</b> จำนวน <strong style="color:var(--text-main)">${Math.abs(val)} pts</strong> ใช่หรือไม่?`,
+            onConfirm: async () => {
+                showLoading();
+                try {
+                    await supabaseClient.from('profiles').update({ points_balance: newPts }).eq('id', userId);
+                    await supabaseClient.from('transactions').insert([{ user_id: userId, action_type: val>0?'EARN':'DEDUCT', points_changed: val, status:'COMPLETED' }]);
+                    logAudit('ปรับปรุงคะแนนบัญชี', `${val>0?'เพิ่ม':'ลด'} ${Math.abs(val)} pts ให้บัญชี "${userName}"`);
+                    document.getElementById(`pts_${userId}`).value = '';
+                    await loadAdminUsers();
+                    if (userId === currentUserId) await loadProfile();
+                    openModal({ type:'success', title:'บันทึกข้อมูลสำเร็จ', message:'ประมวลผลข้อมูลคะแนนเสร็จสมบูรณ์' });
+                } catch(e) { openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: e.message }); }
+                finally { hideLoading(); }
+            }
+        });
+    }
+    
+    function deleteUser(userId, userName) {
+        if (userId === currentUserId) { openModal({ type:'error', title:'การดำเนินการถูกระงับ', message:'ระบบไม่อนุญาตให้ลบบัญชีผู้ใช้งานปัจจุบัน' }); return; }
+        openModal({
+            type:'confirm', title:'ยืนยันการเพิกถอนบัญชี',
+            message:`ลบบัญชี <b style="color:var(--danger)">${userName}</b> ออกจากฐานข้อมูลอย่างถาวร? ข้อมูลการทำรายการทั้งหมดจะถูกลบด้วย`,
+            onConfirm: async () => {
+                showLoading();
+                try {
+                    await supabaseClient.from('transactions').delete().eq('user_id', userId);
+                    await supabaseClient.from('profiles').delete().eq('id', userId);
+                    logAudit('เพิกถอนบัญชี', `ลบบัญชี "${userName}" ออกจากระบบ`);
+                    await loadAdminUsers();
+                    openModal({ type:'success', title:'บันทึกข้อมูลสำเร็จ', message:'ลบข้อมูลบัญชีเรียบร้อยแล้ว' });
+                } catch(e) { openModal({ type:'error', title:'เกิดข้อผิดพลาด', message: e.message }); }
+                finally { hideLoading(); }
+            }
+        });
+    }
+    
+    function exportUsersCSV() {
+        let csv = "\uFEFFรายชื่อพนักงาน,รหัสประจำตัว,ระดับสิทธิ์,คะแนนคงเหลือ\n";
+        allUsersData.forEach(u => { csv += `"${u.full_name||''}","${u.emp_id||''}",${u.tier||'Bronze'},${u.points_balance||0}\n`; });
+        const a = document.createElement('a'); a.href = encodeURI("data:text/csv;charset=utf-8,"+csv);
+        a.download = "employees_export_data.csv"; document.body.appendChild(a); a.click(); a.remove();
+        logAudit('ส่งออกข้อมูล', 'สร้างไฟล์รายงานรายชื่อบัญชีพนักงาน CSV');
+    }
+
+    /* ── AUDIT LOGS ── */
+    async function loadAuditLogs() {
+        const tbody = document.getElementById('adminAuditTableBody');
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)"><span class="material-symbols-outlined" style="display:block;font-size:32px;margin-bottom:8px;color:#cbd5e1;">hourglass_empty</span> กำลังโหลดข้อมูล...</td></tr>';
+
+        const fM = document.getElementById('filterAuditMonth').value;
+        const fY = document.getElementById('filterAuditYear').value;
+        const st = document.getElementById('searchAuditLog').value.toLowerCase().trim();
+        let q = supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false });
+
+        if (fY !== 'all') {
+            const sm = fM !== 'all' ? new Date(fY, fM-1, 1).toISOString() : new Date(fY, 0, 1).toISOString();
+            const em = fM !== 'all' ? new Date(fY, fM, 1).toISOString()   : new Date(parseInt(fY)+1, 0, 1).toISOString();
+            q = q.gte('created_at', sm).lt('created_at', em);
+        }
+        try {
+            const { data: logs, error } = await q; if (error) throw error;
+            let rows = logs || [];
+            if (fY === 'all' && fM !== 'all') rows = rows.filter(r => r.created_at && (new Date(r.created_at).getMonth()+1).toString() === fM);
+            if (st) rows = rows.filter(r => [(r.admin_name||''),(r.action||''),(r.details||'')].join(' ').toLowerCase().includes(st));
+
+            const adminIds = [...new Set(rows.map(r => r.admin_id).filter(Boolean))];
+            let pMap = {};
+            if (adminIds.length) {
+                const { data: profs } = await supabaseClient.from('profiles').select('id,full_name').in('id', adminIds);
+                (profs||[]).forEach(p => pMap[p.id] = p.full_name);
+            }
+            rows = rows.map(r => ({ ...r, admin_name: pMap[r.admin_id] || 'System Admin' }));
+            currentAuditData = rows;
+
+            tbody.innerHTML = '';
+            if (!rows.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)"><span class="material-symbols-outlined" style="display:block;font-size:32px;margin-bottom:8px;color:#cbd5e1;">search_off</span> ไม่พบประวัติรายการ</td></tr>'; return; }
+
+            rows.forEach(log => {
+                const d = new Date(log.created_at);
+                tbody.innerHTML += `
+                <tr>
+                    <td style="font-size:12px;color:var(--text-muted)">${isNaN(d)?'-':d.toLocaleString('th-TH')}</td>
+                    <td style="color:var(--text-main);font-weight:500;">${log.admin_name}</td>
+                    <td><span class="badge" style="background:#f1f5f9;color:var(--text-muted);border:1px solid #e2e8f0;">${log.action}</span></td>
+                    <td style="font-size:13px;color:var(--text-muted)">${log.details||'-'}</td>
+                </tr>`;
+            });
+        } catch(e) { tbody.innerHTML = `<tr><td colspan="4" style="color:var(--danger);text-align:center;padding:20px;">เกิดข้อผิดพลาด: ${e.message}</td></tr>`; }
+    }
+    
+    function exportAuditCSV() {
+        if (!currentAuditData.length) { openModal({ type:'error', title:'ไม่พบข้อมูลอ้างอิง', message:'ไม่มีข้อมูลในตารางสำหรับสร้างรายงาน' }); return; }
+        let csv = "\uFEFFวันและเวลาประทับ,ผู้ดำเนินการ,ประเภทกิจกรรม,รายละเอียดระบุ\n";
+        currentAuditData.forEach(log => {
+            const d = new Date(log.created_at);
+            csv += `"${isNaN(d)?'':d.toLocaleString('th-TH')}","${log.admin_name}","${log.action}","${(log.details||'').replace(/"/g,'""')}"\n`;
+        });
+        const a = document.createElement('a'); a.href = encodeURI("data:text/csv;charset=utf-8,"+csv);
+        a.download = "system_audit_logs.csv"; document.body.appendChild(a); a.click(); a.remove();
+        logAudit('ส่งออกข้อมูล', 'สร้างไฟล์รายงานประวัติระบบ (Audit Log) CSV');
+    }
+
+    /* ── INIT YEAR FILTERS ── */
+    function initYearFilters() {
+        const curY = new Date().getFullYear();
+        ['filterYear','filterAuditYear'].forEach(id => {
+            const el = document.getElementById(id); if (!el || el.options.length > 1) return;
+            for (let y = 2024; y <= curY+1; y++) { const o = document.createElement('option'); o.value = y; o.text = y; el.appendChild(o); }
+            el.value = curY;
+        });
+        document.getElementById('filterMonth').value = (new Date().getMonth()+1).toString();
+        document.getElementById('filterAuditMonth').value = (new Date().getMonth()+1).toString();
+    }
+
+    /* ── MODAL ── */
+    function openModal({ type, title, message, onConfirm }) {
+        document.getElementById('modalBox').style.display = 'block';
+        document.getElementById('modalFormBox').style.display = 'none';
+        document.getElementById('modalBulkPointsBox').style.display = 'none';
+        
+        const ico = document.getElementById('modalIco');
+        ico.className = `modal-ico ${type}`;
+        
+        let iconHtml = '';
+        if(type === 'confirm') iconHtml = '<span class="material-symbols-outlined" style="font-size:36px;">help</span>';
+        else if(type === 'success') iconHtml = '<span class="material-symbols-outlined" style="font-size:36px;">check_circle</span>';
+        else iconHtml = '<span class="material-symbols-outlined" style="font-size:36px;">error</span>';
+        
+        ico.innerHTML = iconHtml;
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalMessage').innerHTML = message;
+        if (type === 'confirm') {
+            document.getElementById('modalBtnsConfirm').style.display = 'flex';
+            document.getElementById('modalBtnsAlert').style.display = 'none';
+            modalCallback = onConfirm;
+        } else {
+            document.getElementById('modalBtnsConfirm').style.display = 'none';
+            document.getElementById('modalBtnsAlert').style.display = 'flex';
+            modalCallback = null;
+        }
+        document.getElementById('modalBackdrop').classList.add('open');
+    }
+    
+    function closeModal() {
+        document.getElementById('modalBackdrop').classList.remove('open');
+        document.getElementById('modalBulkPointsBox').style.display = 'none';
+        modalCallback = null;
+    }
+
+    document.getElementById('btnModalNo').addEventListener('click', closeModal);
+    document.getElementById('btnModalClose').addEventListener('click', closeModal);
+    document.getElementById('btnModalYes').addEventListener('click', () => { const cb = modalCallback; closeModal(); if(cb) cb(); });
+
+    /* ── SIDEBAR TOGGLE ── */
+    document.getElementById('btnHamburger').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('sidebarOverlay').classList.add('show');
+    });
+    document.getElementById('btnCloseSidebar').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('show');
+    });
+    document.getElementById('sidebarOverlay').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('show');
+    });
+
+    /* ── LOGOUT ── */
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await supabaseClient.auth.signOut();
+        window.location.href = "index.html";
+    });
+
+    /* ── START ── */
+    checkAuth();
+</script>
+</body>
+</html>
